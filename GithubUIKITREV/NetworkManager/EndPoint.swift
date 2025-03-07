@@ -31,4 +31,10 @@ extension EndPoint {
             queryItems: [URLQueryItem(name: "per_page" , value: "100"),
                          URLQueryItem(name: "page", value: "\(page)")])
     }
+    
+    static func user(for username: String) -> EndPoint {
+        return EndPoint(
+            path: "/users/\(username)",
+            queryItems: [])
+    }
 }

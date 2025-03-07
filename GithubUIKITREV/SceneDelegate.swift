@@ -16,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let scene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: scene.coordinateSpace.bounds)
         window?.windowScene = scene
-        window?.rootViewController = GFTabBarController()
+        window?.rootViewController = ViewControllerFactory.makeGFTabBarController()
         window?.makeKeyAndVisible()
         
         configureNavigationBar()
@@ -25,6 +25,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func configureNavigationBar() {
         UINavigationBar.appearance().tintColor = .systemGreen
     }
+    
 
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.

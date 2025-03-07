@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		B42A3C712D7D8653003C76EC /* Configurations.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = B42A3C702D7D8653003C76EC /* Configurations.xcconfig */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		B42A3C702D7D8653003C76EC /* Configurations.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Configurations.xcconfig; sourceTree = "<group>"; };
 		B42CDEEC2D774F0200FEC202 /* GithubUIKITREV.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GithubUIKITREV.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -45,6 +50,7 @@
 		B42CDEE32D774F0200FEC202 = {
 			isa = PBXGroup;
 			children = (
+				B42A3C702D7D8653003C76EC /* Configurations.xcconfig */,
 				B42CDEEE2D774F0200FEC202 /* GithubUIKITREV */,
 				B42CDEED2D774F0200FEC202 /* Products */,
 			);
@@ -122,6 +128,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B42A3C712D7D8653003C76EC /* Configurations.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -196,6 +203,7 @@
 		};
 		B42CDF022D774F0400FEC202 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B42A3C702D7D8653003C76EC /* Configurations.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -259,6 +267,7 @@
 		};
 		B42CDF032D774F0400FEC202 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B42A3C702D7D8653003C76EC /* Configurations.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

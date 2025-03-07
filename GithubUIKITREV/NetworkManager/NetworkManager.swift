@@ -7,12 +7,12 @@
 
 import Foundation
 
-final class NetworkManager: NetworkService {
-    private init() {}
+final class NetworkManager: NetworkServiceProtocol {
+    private let imageCacheManager: ImageCacheServiceProtocol
     
-    static let shared = NetworkManager()
-    let imageCacheManager = ImageCacheManager.shared
-   
+    init(imageCacheManager: ImageCacheServiceProtocol) {
+        self.imageCacheManager = imageCacheManager
+    }
     
     func getData<T: Codable>(endPoint: EndPoint, completion: @escaping (Result<T, GFError>) -> Void) {
         guard let url = endPoint.url else {
@@ -20,11 +20,15 @@ final class NetworkManager: NetworkService {
             return
         }
         
-        let urlRequest = URLRequest(url: url)
+        var urlRequest = URLRequest(url: url)
+        if let token = Bundle.main.infoDictionary?["ACCESS_TOKEN"] as? String {
+               urlRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        
         
         let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             
-            if let _ = error {
+            if error != nil {
                 completion(.failure(.unableToCompleteRequest))
                 return
             }
@@ -42,7 +46,9 @@ final class NetworkManager: NetworkService {
             
             do {
                 let decoder = JSONDecoder()
+                decoder.keyDecodingStrategy = .convertFromSnakeCase
                 let result = try decoder.decode(T.self, from: data)
+                
                 completion(.success(result))
             } catch {
                 completion(.failure(.invalidData))
@@ -63,11 +69,10 @@ final class NetworkManager: NetworkService {
             return
         }
         
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            
-            guard error == nil,
-                  let response = response as? HTTPURLResponse, response.statusCode == 200,
-                  let data = data else {
+        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            guard let self = self,
+                  let data = data,
+                  let response = response as? HTTPURLResponse, response.statusCode == 200 else {
                 completion(nil)
                 return
             }
@@ -81,8 +86,7 @@ final class NetworkManager: NetworkService {
 }
 
 
-protocol NetworkService {
+protocol NetworkServiceProtocol {
     func getData<T: Codable>(endPoint: EndPoint, completion: @escaping (Result<T, GFError>) -> Void)
-    
     func downloadImage(from urlString: String, completion: @escaping (Data?) -> Void)
 }
