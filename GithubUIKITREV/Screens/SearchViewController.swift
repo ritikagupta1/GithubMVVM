@@ -7,7 +7,7 @@
 
 import UIKit
 
-class SearchViewController: UIViewController {
+final class SearchViewController: UIViewController {
     let logoImageView = UIImageView(image: .ghLogo)
     let userNameTextField = GFTextField()
     let getFollowersButton = GFButton(backgroundColor: .systemGreen, title: "Get Followers")
@@ -91,13 +91,17 @@ class SearchViewController: UIViewController {
     @objc func pushFollowerListVC() {
         guard isUserNameEntered, let userName = userNameTextField.text else {
             self.presentGFAlertViewController(
-                title: "Empty Username",
-                message: "Please enter an username, we need to know who to look for 😄.",
-                buttonTitle: "Ok")
+                title: Constants.emptyUserNameTitle,
+                message: Constants.emptyUserNameMessage,
+                buttonTitle: Constants.ok)
             return
         }
         userNameTextField.resignFirstResponder()
-        let followerListVC = ViewControllerFactory.makeFollowersListVC(with: userName)
+        let followerListViewModel = FollowerListViewModel(
+            userName: userName,
+            networkManager: NetworkManager(),
+            persistenceManager: PersistenceManager())
+        let followerListVC = FollowersListVC(viewModel: followerListViewModel)
         self.navigationController?.pushViewController(followerListVC, animated: true)
     }
 }

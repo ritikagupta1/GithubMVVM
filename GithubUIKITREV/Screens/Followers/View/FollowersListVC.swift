@@ -130,10 +130,10 @@ extension FollowersListVC: UICollectionViewDelegate {
     
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedFollower = self.viewModel.getSelectedFollower(index: indexPath.row)
-        let userInfoVC = ViewControllerFactory.makeUserInfoVC(userName: selectedFollower.login)
-        userInfoVC.delegate = self
-        self.present(UINavigationController(rootViewController: userInfoVC), animated: true)
+//        let selectedFollower = self.viewModel.getSelectedFollower(index: indexPath.row)
+//        let userInfoVC = ViewControllerFactory.makeUserInfoVC(userName: selectedFollower.login)
+//        userInfoVC.delegate = self
+//        self.present(UINavigationController(rootViewController: userInfoVC), animated: true)
     }
 }
 

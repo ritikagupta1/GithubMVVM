@@ -109,7 +109,7 @@ class GFUserInfoVC: GFDataLoadingVC {
     }
     
     func configureUIElements(with user: User) {
-        self.add(childVC: ViewControllerFactory.makeUserInfoHeaderVC(with: user), to: self.headerView)
+//        self.add(childVC: ViewControllerFactory.makeUserInfoHeaderVC(with: user), to: self.headerView)
         self.add(childVC: GFRepoItemVC(user: user, delegate: self), to: self.itemViewOne)
         self.add(childVC: GFFollowersInfoVC(user: user, delegate: self), to: self.itemViewTwo)
         self.dateLabel.text = "Github since \(user.createdAt.convertToDisplayFormat())"

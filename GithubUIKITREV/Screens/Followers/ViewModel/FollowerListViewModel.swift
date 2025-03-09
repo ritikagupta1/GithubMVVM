@@ -53,10 +53,10 @@ class FollowerListViewModel: FollowerListViewModelProtocol {
     
     
     func getFollowers() {
-        let endPoint = EndPoint.getFollowers(for: userName, page: page)
+        let endPoint = FollowerRequest(userName: userName, page: page)
         isLoadingFollowers = true
         networkManager.getData(
-            endPoint: endPoint) { [weak self] (result: Result<[Follower],GFError>) in
+            endPoint: endPoint) { [weak self] (result: Result<[Follower],NetworkError>) in
                 guard let self else { return }
                 defer {
                     self.isLoadingFollowers = false
@@ -85,24 +85,24 @@ class FollowerListViewModel: FollowerListViewModelProtocol {
     
     
     func addToFavourites() {
-        networkManager.getData(endPoint: EndPoint.user(for: userName)) { (result: Result<User,GFError>) in
-            switch result {
-                
-            case .success(let user):
-                let follower = Follower(login: user.login, avatarUrl: user.avatarUrl)
-                self.persistenceManager.updateFavourites(actionType: .add, favourite: follower) { [weak self] error in
-                    guard let self else { return }
-                    guard let error else {
-                        self.delegate?.didFinishAddingToFavourites(.success)
-                        return
-                    }
-                    self.delegate?.didFinishAddingToFavourites(.failure(errorMessage: error.rawValue))
-                }
-            
-            case .failure(let error):
-                self.delegate?.didFinishAddingToFavourites(.failure(errorMessage: error.rawValue))
-            }
-        }
+//        networkManager.getData(endPoint: UserRequest(userName: userName)) { (result: Result<User,GFError>) in
+//            switch result {
+//                
+//            case .success(let user):
+//                let follower = Follower(login: user.login, avatarUrl: user.avatarUrl)
+//                self.persistenceManager.updateFavourites(actionType: .add, favourite: follower) { [weak self] error in
+//                    guard let self else { return }
+//                    guard let error else {
+//                        self.delegate?.didFinishAddingToFavourites(.success)
+//                        return
+//                    }
+//                    self.delegate?.didFinishAddingToFavourites(.failure(errorMessage: error.rawValue))
+//                }
+//            
+//            case .failure(let error):
+//                self.delegate?.didFinishAddingToFavourites(.failure(errorMessage: error.rawValue))
+//            }
+//        }
     }
     
     

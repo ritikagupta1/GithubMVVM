@@ -68,9 +68,9 @@ extension FavouritesListVC: UITableViewDataSource, UITableViewDelegate {
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedFavourite = self.viewModel.getFavourite(at: indexPath.row)
-        let destinationVC = ViewControllerFactory.makeFollowersListVC(with: selectedFavourite.login)
-        navigationController?.pushViewController(destinationVC, animated: true)
+//        let selectedFavourite = self.viewModel.getFavourite(at: indexPath.row)
+//        let destinationVC = ViewControllerFactory.makeFollowersListVC(with: selectedFavourite.login)
+//        navigationController?.pushViewController(destinationVC, animated: true)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {

@@ -28,7 +28,7 @@ class GFUserInfoViewModel: GFUserInfoViewModelProtocol {
     
     
     func getUserInfo() {
-        networkManager.getData(endPoint: EndPoint.user(for: userName)) { [weak self] (result: Result<User,GFError>) in
+        networkManager.getData(endPoint: UserRequest(userName: userName)) { [weak self] (result: Result<User,NetworkError>) in
             guard let self = self else {
                 return
             }

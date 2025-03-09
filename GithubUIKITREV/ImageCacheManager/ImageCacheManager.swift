@@ -10,6 +10,10 @@ import Foundation
 final class ImageCacheManager: ImageCacheServiceProtocol {
     private let imageCache = NSCache<NSString, NSData>()
     
+    static let shared = ImageCacheManager()
+    
+    private init() {}
+    
     func set(imageData: Data, for key: String) {
         imageCache.setObject(imageData as NSData, forKey: NSString(string: key))
     }

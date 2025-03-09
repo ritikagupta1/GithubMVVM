@@ -8,13 +8,7 @@
 import Foundation
 
 final class NetworkManager: NetworkServiceProtocol {
-    private let imageCacheManager: ImageCacheServiceProtocol
-    
-    init(imageCacheManager: ImageCacheServiceProtocol) {
-        self.imageCacheManager = imageCacheManager
-    }
-    
-    func getData<T: Codable>(endPoint: EndPoint, completion: @escaping (Result<T, GFError>) -> Void) {
+    func getData<T: Codable>(endPoint: EndPoint, completion: @escaping (Result<T, NetworkError>) -> Void) {
         guard let url = endPoint.url else {
             completion(.failure(.invalidUserName))
             return
@@ -22,12 +16,53 @@ final class NetworkManager: NetworkServiceProtocol {
         
         var urlRequest = URLRequest(url: url)
         if let token = Bundle.main.infoDictionary?["ACCESS_TOKEN"] as? String {
-               urlRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            urlRequest.addValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
         
+        fetchData(request: urlRequest) { result in
+            switch result {
+            case .success(let data):
+                do {
+                    let decoder = JSONDecoder()
+                    decoder.keyDecodingStrategy = .convertFromSnakeCase
+                    let result = try decoder.decode(T.self, from: data)
+                    
+                    completion(.success(result))
+                } catch {
+                    completion(.failure(.invalidData))
+                }
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+    func downloadImage(from urlString: String, completion: @escaping (Data?) -> Void) {
+        guard let imageUrl = URL(string: urlString) else {
+            completion(nil)
+            return
+        }
         
-        let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            
+        let request = URLRequest(url: imageUrl)
+        
+        fetchData(request: request) { result in
+            switch result {
+            case .success(let imageData):
+                completion(imageData)
+            case .failure:
+                completion(nil)
+            }
+        }
+    }
+    
+    
+    private func fetchData(request: URLRequest?, completion: @escaping (Result<Data, NetworkError>) -> Void) {
+        guard let request = request else {
+            completion(.failure(.invalidUserName))
+            return
+        }
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
             if error != nil {
                 completion(.failure(.unableToCompleteRequest))
                 return
@@ -43,42 +78,7 @@ final class NetworkManager: NetworkServiceProtocol {
                 return
             }
             
-            
-            do {
-                let decoder = JSONDecoder()
-                decoder.keyDecodingStrategy = .convertFromSnakeCase
-                let result = try decoder.decode(T.self, from: data)
-                
-                completion(.success(result))
-            } catch {
-                completion(.failure(.invalidData))
-            }
-        }
-        
-        task.resume()
-    }
-    
-    func downloadImage(from urlString: String, completion: @escaping (Data?) -> Void) {
-        if let imageData = imageCacheManager.getImageData(for: urlString) {
-            completion(imageData)
-            return
-        }
-        
-        guard let url = URL(string: urlString) else {
-            completion(nil)
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
-            guard let self = self,
-                  let data = data,
-                  let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-                completion(nil)
-                return
-            }
-            
-            self.imageCacheManager.set(imageData: data, for: urlString)
-            completion(data)
+            completion(.success(data))
         }
         
         task.resume()
@@ -87,6 +87,6 @@ final class NetworkManager: NetworkServiceProtocol {
 
 
 protocol NetworkServiceProtocol {
-    func getData<T: Codable>(endPoint: EndPoint, completion: @escaping (Result<T, GFError>) -> Void)
+    func getData<T: Codable>(endPoint: EndPoint, completion: @escaping (Result<T, NetworkError>) -> Void)
     func downloadImage(from urlString: String, completion: @escaping (Data?) -> Void)
 }

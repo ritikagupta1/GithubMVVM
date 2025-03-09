@@ -7,7 +7,7 @@
 
 import UIKit
 
-class GFTabBarController: UITabBarController {
+final class GFTabBarController: UITabBarController {
     init() {
         super.init(nibName: nil, bundle: nil)
     }
@@ -23,16 +23,19 @@ class GFTabBarController: UITabBarController {
     }
 
     private func createSearchVC() -> UINavigationController {
-        let searchVC = ViewControllerFactory.makeSearchVC()
+        let searchVC = SearchViewController()
         searchVC.tabBarItem  = UITabBarItem(tabBarSystemItem: .search, tag: 1)
-        searchVC.title = "Search"
+        searchVC.title = Constants.search
         return UINavigationController(rootViewController: searchVC)
     }
     
     private func createFavouriteVC() -> UINavigationController {
-        let favouriteVC = ViewControllerFactory.makeFavouritesListVC()
+        let favouritesViewModel = FavouritesListViewModel(
+            persistenceManager: PersistenceManager(),
+            networkManager: NetworkManager())
+        let favouriteVC = FavouritesListVC(viewModel: favouritesViewModel)
         favouriteVC.tabBarItem  = UITabBarItem(tabBarSystemItem: .favorites, tag: 2)
-        favouriteVC.title = "Favourites"
+        favouriteVC.title = Constants.favourites
         return UINavigationController(rootViewController: favouriteVC)
     }
 }

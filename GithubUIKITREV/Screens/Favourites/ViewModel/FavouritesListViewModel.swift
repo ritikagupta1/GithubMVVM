@@ -37,18 +37,18 @@ class FavouritesListViewModel: FavouritesListViewModelProtocol {
     }
     
     func getFavourites() {
-        persistenceManager.retrieveFavourites { [weak self] result in
-            guard let self = self else {return}
-            
-            switch result {
-            case .success(let favourites):
-                self.favourites = favourites
-                delegate?.didUpdateFavourites(self.favourites)
-        
-            case .failure(let error):
-                delegate?.didFailToFavouriteUser(with: error.rawValue)
-            }
-        }
+//        persistenceManager.retrieveFavourites { [weak self] result in
+//            guard let self = self else {return}
+//            
+//            switch result {
+//            case .success(let favourites):
+//                self.favourites = favourites
+//                delegate?.didUpdateFavourites(self.favourites)
+//        
+//            case .failure(let error):
+//                delegate?.didFailToFavouriteUser(with: error.rawValue)
+//            }
+//        }
     }
     
     func getFavourite(at index: Int) -> Follower {
@@ -56,19 +56,19 @@ class FavouritesListViewModel: FavouritesListViewModelProtocol {
     }
     
     func removeFavourites(at index: Int) {
-        let favourite = self.favourites[index]
-        persistenceManager.updateFavourites(actionType: .remove, favourite: favourite) { [weak self] error in
-            guard let self = self else {
-                return
-            }
-            guard let error = error else {
-                self.favourites.remove(at: index)
-                self.delegate?.didRemoveFavourite(at: index)
-                return
-            }
-            
-            self.delegate?.didFailToRemoveFavourite(with: error.rawValue)
-        }
+//        let favourite = self.favourites[index]
+//        persistenceManager.updateFavourites(actionType: .remove, favourite: favourite) { [weak self] error in
+//            guard let self = self else {
+//                return
+//            }
+//            guard let error = error else {
+//                self.favourites.remove(at: index)
+//                self.delegate?.didRemoveFavourite(at: index)
+//                return
+//            }
+//            
+//            self.delegate?.didFailToRemoveFavourite(with: error.rawValue)
+//        }
     }
 }
 

@@ -7,9 +7,9 @@
 
 import Foundation
 
-struct EndPoint {
-    let path: String
-    let queryItems: [URLQueryItem]
+protocol EndPoint {
+    var path: String {get}
+    var queryItems: [URLQueryItem] {get}
 }
 
 extension EndPoint {
@@ -24,17 +24,26 @@ extension EndPoint {
     }
 }
 
-extension EndPoint {
-    static func getFollowers(for userName: String, page: Int) -> EndPoint {
-        EndPoint(
-            path: "/users/\(userName)/followers",
-            queryItems: [URLQueryItem(name: "per_page" , value: "100"),
-                         URLQueryItem(name: "page", value: "\(page)")])
+struct FollowerRequest: EndPoint {
+    let userName: String
+    let page: Int
+    
+    var path: String {
+        "/users/\(userName)/followers"
     }
     
-    static func user(for username: String) -> EndPoint {
-        return EndPoint(
-            path: "/users/\(username)",
-            queryItems: [])
+    var queryItems: [URLQueryItem] {
+        [URLQueryItem(name: "per_page" , value: "100"),
+         URLQueryItem(name: "page", value: "\(page)")]
     }
+}
+
+struct UserRequest: EndPoint {
+    let userName: String
+    
+    var path: String {
+        "/users/\(userName)"
+    }
+    
+    var queryItems: [URLQueryItem] { [] }
 }

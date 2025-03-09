@@ -16,23 +16,21 @@ final class PersistenceManager: PersistenceManagerProtocol {
         static let favourites = "Favourites"
     }
     
-    func retrieveFavourites(completion: @escaping (Result<[Follower], GFError>) -> Void) {
+    func retrieveFavourites() -> Result<[Follower], PersistenceError> {
         guard let favouritesData = UserDefaults.standard.object(forKey: Key.favourites) as? Data else {
-            completion(.success([]))
-            return
+            return .success([])
         }
         
         do {
             let decoder = JSONDecoder()
             let favourites = try decoder.decode([Follower].self, from: favouritesData)
-            completion(.success(favourites))
+            return .success(favourites)
         } catch {
-            completion(.failure(.unableToFavourites))
+            return .failure(.unableToFavourites)
         }
     }
     
-    
-    func saveFavourites(favourites: [Follower]) -> GFError? {
+    func saveFavourites(favourites: [Follower]) -> PersistenceError? {
         do {
             let encoder = JSONEncoder()
             let favouritesData = try encoder.encode(favourites)
@@ -43,33 +41,31 @@ final class PersistenceManager: PersistenceManagerProtocol {
         }
     }
     
-    
-    func updateFavourites(actionType: PersistenceManagerAction, favourite: Follower, completion: @escaping (GFError?) -> Void) {
-        self.retrieveFavourites { result in
-            switch result {
-            case .success(var favourites):
-                switch actionType {
-                case .add:
-                    guard !favourites.contains(favourite) else {
-                        completion(.alreadyAddedToFavourites)
-                        return
-                    }
-                    
-                    favourites.append(favourite)
-                
-                case .remove:
-                    favourites.removeAll{ $0.login == favourite.login }
+    func updateFavourites(actionType: PersistenceManagerAction, favourite: Follower) -> PersistenceError? {
+        let retrieveFavourites = self.retrieveFavourites()
+        
+        switch retrieveFavourites {
+        case .success(var existingFavourites):
+            switch actionType {
+            case .add:
+                guard !existingFavourites.contains(favourite) else {
+                    return .alreadyAddedToFavourites
                 }
                 
-               completion(self.saveFavourites(favourites: favourites))
-            case .failure(let error):
-                completion(error)
+                existingFavourites.append(favourite)
+                
+            case .remove:
+                existingFavourites.removeAll{ $0.login == favourite.login }
             }
+            
+            return saveFavourites(favourites: existingFavourites)
+        case .failure(let error):
+            return error
         }
     }
 }
 
 protocol PersistenceManagerProtocol {
-    func updateFavourites(actionType: PersistenceManagerAction, favourite: Follower, completion: @escaping (GFError?) -> Void)
-    func retrieveFavourites(completion: @escaping (Result<[Follower], GFError>) -> Void)
+    func updateFavourites(actionType: PersistenceManagerAction, favourite: Follower) -> PersistenceError?
+    func retrieveFavourites() -> Result<[Follower], PersistenceError>
 }
