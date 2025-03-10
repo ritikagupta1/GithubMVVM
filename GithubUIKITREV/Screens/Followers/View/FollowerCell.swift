@@ -7,6 +7,12 @@
 
 import UIKit
 
+/*
+ - class can be final
+ - Make sure all UI properties are lazy
+ - Image loading will most probably fail here.
+ */
+
 final class FollowerCell: UICollectionViewCell {
     static let reuseIdentifier = "followerCell"
     

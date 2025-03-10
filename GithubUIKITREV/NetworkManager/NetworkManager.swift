@@ -7,6 +7,13 @@
 
 import Foundation
 
+/*
+ - Coupled with ImageCacheManager
+ - NetworkManager should be responsible for network activity only.
+ - Separate class for networkManager
+ - Separate class for ImageDownload.
+ */
+
 final class NetworkManager: NetworkServiceProtocol {
     func getData<T: Codable>(endPoint: EndPoint, completion: @escaping (Result<T, NetworkError>) -> Void) {
         guard let url = endPoint.url else {

@@ -6,24 +6,24 @@
 //
 
 import UIKit
-
-enum Section {
-    case main
-}
+/*
+ - Class can be final.
+ - Collection view can be lazy and remove force unwrapping.
+ - Remove force unwrapping of datasource - Code Smell.
+ - Viewcontroller bloated with responsibilites of Search and CollectionView. - Code Smell.
+ */
 
 final class FollowersListVC: GFDataLoadingVC {
     var viewModel: FollowerListViewModelProtocol
     
+    private var collectionViewManager: FollowerListCollectionViewManager?
+    private var searchManager: FollowerListSearchManager?
+    
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UIHelper.createCollectionViewFlowLayout(in: self.view))
-        collectionView.backgroundColor = .systemBackground
         view.addSubview(collectionView)
-        collectionView.delegate = self
-        collectionView.register(FollowerCell.self, forCellWithReuseIdentifier: FollowerCell.reuseIdentifier)
         return collectionView
     }()
-    
-    var dataSource: UICollectionViewDiffableDataSource<Section,FollowerViewModel>?
     
     init(viewModel: FollowerListViewModelProtocol) {
         self.viewModel = viewModel
@@ -40,8 +40,8 @@ final class FollowersListVC: GFDataLoadingVC {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.configureViewController()
-        self.configureSearchController()
-        self.setUpDataSource()
+        self.configureCollectionViewManager()
+        self.configureSearchManager()
         self.getFollowers()
     }
     
@@ -56,76 +56,27 @@ final class FollowersListVC: GFDataLoadingVC {
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addFavourites))
     }
     
-    private func configureSearchController() {
-        let searchController = UISearchController()
-        searchController.searchResultsUpdater = self
-        searchController.searchBar.placeholder = Constants.userName
-        
-        navigationItem.searchController = searchController
-        navigationItem.hidesSearchBarWhenScrolling = false
+    private func configureSearchManager() {
+        searchManager = FollowerListSearchManager(
+            collectionView: collectionView,
+            parentViewController: self,
+            viewModel: viewModel)
     }
     
+    private func configureCollectionViewManager() {
+        collectionViewManager = FollowerListCollectionViewManager(
+            collectionView: collectionView,
+            parentViewController: self,
+            viewModel: viewModel)
+    }
     
-    private func getFollowers() {
+    func getFollowers() {
         self.showLoadingView()
         self.viewModel.getFollowers()
     }
     
     @objc func addFavourites() {
         self.viewModel.addToFavourites()
-    }
-}
-
-// MARK: COLLECTIONVIEW DATASOURCE
-extension FollowersListVC {
-    private func setUpDataSource() {
-        dataSource = UICollectionViewDiffableDataSource(collectionView: self.collectionView, cellProvider: {collectionView, indexPath, followerViewModel in
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FollowerCell.reuseIdentifier, for: indexPath) as? FollowerCell
-            cell?.setup(with: followerViewModel)
-            return cell ?? UICollectionViewCell()
-        })
-    }
-    
-    private func applySnapshot(with followers: [FollowerViewModel]) {
-        var snapShot = NSDiffableDataSourceSnapshot<Section,FollowerViewModel>()
-        snapShot.appendSections([Section.main])
-        snapShot.appendItems(followers)
-        dataSource?.apply(snapShot, animatingDifferences: true)
-    }
-    
-}
-
-// MARK: SEARCH RESULTS FILTERING
-extension FollowersListVC: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        guard let searchText = searchController.searchBar.text, !searchText.isEmpty else {
-            viewModel.resetSearch()
-            return
-        }
-        
-        viewModel.filterFollowers(with: searchText)
-    }
-}
-
-// MARK: COLLECTIONVIEW DELEGATE
-extension FollowersListVC: UICollectionViewDelegate {
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        let offSetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let height = scrollView.frame.height
-        
-        if offSetY > contentHeight - height && viewModel.canFetchMoreFollowers() {
-            self.getFollowers()
-        }
-    }
-    
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let selectedFollowerLoginID = self.viewModel.getSelectedFollower(index: indexPath.row)
-        let viewModel = GFUserInfoViewModel(userName: selectedFollowerLoginID, networkManager: NetworkManager())
-        let userInfoVC = GFUserInfoVC(viewModel: viewModel)
-        userInfoVC.delegate = self
-        self.present(UINavigationController(rootViewController: userInfoVC), animated: true)
     }
 }
 
@@ -153,7 +104,7 @@ extension FollowersListVC: FollowerListViewModelDelegate {
             if !isSearchActive && followers.isEmpty {
                 self.showEmptyStateView(with: Constants.emptyStateMessage)
             } else {
-                self.applySnapshot(with: followers)
+                self.collectionViewManager?.applySnapshot(with: followers)
             }
         }
     }

@@ -11,6 +11,11 @@ enum PersistenceManagerAction {
     case remove
 }
 
+/*
+ - Why is retrieveFavourites asynchronous?
+ - Because of which updateFavourites is also asynchronous?
+ */
+
 final class PersistenceManager: PersistenceManagerProtocol {
     enum Key {
         static let favourites = "Favourites"

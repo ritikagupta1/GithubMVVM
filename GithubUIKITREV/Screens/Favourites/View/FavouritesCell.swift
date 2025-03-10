@@ -7,6 +7,12 @@
 
 import UIKit
 
+/*
+ - Class can be final.
+ - Why do you need reference of viewmodel in the class.
+ - Images will not appear properly in cells. - Blunder
+ */
+
 final class FavouriteCell: UITableViewCell {
     static let reuseID = "favouriteCell"
     

@@ -6,18 +6,21 @@
 //
 
 import UIKit
+/*
+ - Class can be final.
+ - ViewController is overpopulated with responsibilities of handling tableview. Looks for a way to move it out of the viewcontroller.
+ - Why is getFavourties called in viewwillappear? - so that favourites are fetched when screen appeears to show latest set of favourites
+ - Why is favouriteCellViewModel created everytime in cellforrow method - Blunder.
+ */
 
 final class FavouritesListVC: GFDataLoadingVC {
     lazy var tableView: UITableView = {
         let tableView = UITableView()
         self.view.addSubview(tableView)
-        tableView.frame = view.bounds
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.rowHeight = 80.0
-        tableView.register(FavouriteCell.self, forCellReuseIdentifier: FavouriteCell.reuseID)
         return tableView
     }()
+    
+    private var tableViewManager: FavouritesListTableViewManager?
     
     var viewModel: FavouritesListViewModelProtocol
     
@@ -35,6 +38,7 @@ final class FavouritesListVC: GFDataLoadingVC {
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViewController()
+        configureTableViewManager()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -42,44 +46,18 @@ final class FavouritesListVC: GFDataLoadingVC {
         self.viewModel.getFavourites()
     }
     
-    func configureViewController() {
+    private func configureViewController() {
         self.view.backgroundColor = .systemBackground
-        self.title = "Favourites"
+        self.title = Constants.favourites
         self.navigationController?.navigationBar.prefersLargeTitles = true
     }
-}
-
-extension FavouritesListVC: UITableViewDataSource, UITableViewDelegate {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.getRowCount()
-    }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: FavouriteCell.reuseID, for: indexPath) as? FavouriteCell else {
-            return UITableViewCell()
-        }
-        let favouriteCellViewModel = self.viewModel.getFavouriteViewModel(at: indexPath.row)
-        cell.set(with: favouriteCellViewModel)
-        return cell
-    }
-    
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let selectedFavouriteLogin = self.viewModel.getFavouriteLogin(at: indexPath.row)
-        let vm = FollowerListViewModel(userName: selectedFavouriteLogin,
-                                                  networkManager: NetworkManager(),
-                                                  persistenceManager: PersistenceManager(),
-                                                  imageLoader: ImageLoader())
-        let destVC = FollowersListVC(viewModel: vm)
-        navigationController?.pushViewController(destVC, animated: true)
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard editingStyle == .delete else {
-            return
-        }
-        
-        self.viewModel.removeFavourites(at: indexPath.row)
+    private func configureTableViewManager() {
+        tableViewManager = FavouritesListTableViewManager(
+            tableView: tableView,
+            viewModel: viewModel,
+            parentViewController: self
+        )
     }
 }
 
@@ -106,6 +84,7 @@ extension FavouritesListVC: FavouritesListViewModelDelegate {
     func didRemoveFavourite(at rowIndex: Int) {
         DispatchQueue.main.async {
             self.tableView.deleteRows(at: [IndexPath(row: rowIndex, section: 0)], with: .left)
+            if self.viewModel.getRowCount() == 0 { self.showEmptyStateView(with: Constants.noFavourites) }
         }
     }
     
@@ -114,5 +93,4 @@ extension FavouritesListVC: FavouritesListViewModelDelegate {
             self.presentGFAlertViewController(title: Constants.unableToRemoveFavouriteUser, message: errorMessage, buttonTitle: Constants.ok)
         }
     }
-    
 }

@@ -7,6 +7,8 @@
 
 import Foundation
 
+//Is this threadsafe.
+
 final class ImageCacheManager: ImageCacheServiceProtocol {
     private let imageCache = NSCache<NSString, NSData>()
     

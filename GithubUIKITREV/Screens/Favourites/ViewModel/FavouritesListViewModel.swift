@@ -6,7 +6,7 @@
 //
 
 import Foundation
-protocol FavouritesListViewModelProtocol {
+protocol FavouritesListViewModelProtocol: AnyObject {
     var delegate: FavouritesListViewModelDelegate? { get set }
     
     var imageLoader: ImageLoaderProtocol { get }
