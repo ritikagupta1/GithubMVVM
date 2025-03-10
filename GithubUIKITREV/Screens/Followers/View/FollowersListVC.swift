@@ -71,7 +71,6 @@ final class FollowersListVC: GFDataLoadingVC {
     }
     
     func getFollowers() {
-        self.showLoadingView()
         self.viewModel.getFollowers()
     }
     
@@ -81,6 +80,12 @@ final class FollowersListVC: GFDataLoadingVC {
 }
 
 extension FollowersListVC: FollowerListViewModelDelegate {
+    func didChangeLoadingState(isLoading: Bool) {
+        DispatchQueue.main.async {
+            isLoading ? self.showLoadingView() : self.dismissLoadingView()
+        }
+    }
+    
     func didFinishAddingToFavourites(_ result: AddFavouriteResult) {
         DispatchQueue.main.async {
             switch result {
@@ -100,18 +105,15 @@ extension FollowersListVC: FollowerListViewModelDelegate {
     
     func didUpdateFollowers(_ followers: [FollowerViewModel], isSearchActive: Bool) {
         DispatchQueue.main.async {
-            self.dismissLoadingView()
+            self.collectionViewManager?.applySnapshot(with: followers)
             if !isSearchActive && followers.isEmpty {
                 self.showEmptyStateView(with: Constants.emptyStateMessage)
-            } else {
-                self.collectionViewManager?.applySnapshot(with: followers)
             }
         }
     }
     
     func didFailToFetchFollowers(_ message: String) {
         DispatchQueue.main.async {
-            self.dismissLoadingView()
             self.presentGFAlertViewController(
                 title: Constants.badStuffHappenedTitle,
                 message: message,

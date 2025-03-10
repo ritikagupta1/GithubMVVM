@@ -103,7 +103,6 @@ final class GFUserInfoVC: GFDataLoadingVC {
     }
     
     func getUserInfo() {
-        self.showLoadingView()
         self.viewModel.getUserInfo()
     }
     
@@ -148,16 +147,20 @@ extension GFUserInfoVC: GFFollowersInfoVCDelegate {
 }
 
 extension GFUserInfoVC: GFUserInfoViewModelDelegate {
+    func didChangeLoadingState(isLoading: Bool) {
+        DispatchQueue.main.async {
+            isLoading ? self.showLoadingView() : self.dismissLoadingView()
+        }
+    }
+    
     func didReceiveUserDetails(_ user: User) {
         DispatchQueue.main.async {
-            self.dismissLoadingView()
             self.configureUIElements(with: user)
         }
     }
     
     func didReceiveError(_ errorMessage: String) {
         DispatchQueue.main.async {
-            self.dismissLoadingView()
             self.presentGFAlertViewController(
                 title: Constants.somethingWentWrongTitle,
                 message: errorMessage,

@@ -34,11 +34,17 @@ final class FollowerListViewModel: FollowerListViewModelProtocol {
     
     private var page: Int = 1
     
-    private var isLoadingFollowers: Bool = false
+    private var isLoadingFollowers: Bool = false {
+        didSet {
+            delegate?.didChangeLoadingState(isLoading: isLoadingFollowers)
+        }
+    }
+    
     private var hasMoreFollowers: Bool = true
     
     private var isSearching: Bool = false
     private var queryText: String = ""
+    
     
     let networkManager: NetworkServiceProtocol
     let persistenceManager: PersistenceManagerProtocol
@@ -149,6 +155,7 @@ enum AddFavouriteResult {
 }
 
 protocol FollowerListViewModelDelegate: AnyObject {
+    func didChangeLoadingState(isLoading: Bool)
     func didUpdateFollowers(_ followers: [FollowerViewModel], isSearchActive: Bool)
     func didFailToFetchFollowers(_ message: String)
     func didFinishAddingToFavourites(_ result: AddFavouriteResult)

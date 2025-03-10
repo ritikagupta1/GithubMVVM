@@ -22,6 +22,12 @@ final class GFUserInfoViewModel: GFUserInfoViewModelProtocol {
     
     weak var delegate: GFUserInfoViewModelDelegate?
     
+    private var isLoadingUserInfo: Bool = false {
+        didSet {
+            delegate?.didChangeLoadingState(isLoading: isLoadingUserInfo)
+        }
+    }
+    
     init(userName: String, networkManager: NetworkServiceProtocol) {
         self.userName = userName
         self.networkManager = networkManager
@@ -29,11 +35,14 @@ final class GFUserInfoViewModel: GFUserInfoViewModelProtocol {
     
     
     func getUserInfo() {
+        isLoadingUserInfo = true
         networkManager.getData(endPoint: UserRequest(userName: userName)) { [weak self] (result: Result<User,NetworkError>) in
             guard let self = self else {
                 return
             }
-            
+            defer {
+                self.isLoadingUserInfo = false
+            }
             switch result {
             case .success(let user):
                 delegate?.didReceiveUserDetails(user)
@@ -46,6 +55,7 @@ final class GFUserInfoViewModel: GFUserInfoViewModelProtocol {
 }
 
 protocol GFUserInfoViewModelDelegate: AnyObject {
+    func didChangeLoadingState(isLoading: Bool)
     func didReceiveUserDetails(_ user: User)
     func didReceiveError(_ errorMessage: String)
 }
