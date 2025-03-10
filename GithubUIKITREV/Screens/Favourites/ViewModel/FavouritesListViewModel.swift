@@ -9,27 +9,27 @@ import Foundation
 protocol FavouritesListViewModelProtocol {
     var delegate: FavouritesListViewModelDelegate? { get set }
     
-    
-    var networkManager: NetworkServiceProtocol { get }
+    var imageLoader: ImageLoaderProtocol { get }
     var persistenceManager: PersistenceManagerProtocol { get }
     
     func getRowCount() -> Int
     func getFavourites()
-    func getFavourite(at index: Int) -> Follower
+    func getFavouriteViewModel(at index: Int) -> FavouriteViewModel
+    func getFavouriteLogin(at index: Int) -> String
     func removeFavourites(at Index: Int)
 }
 
-class FavouritesListViewModel: FavouritesListViewModelProtocol {
+final class FavouritesListViewModel: FavouritesListViewModelProtocol {
     let persistenceManager: PersistenceManagerProtocol
-    let networkManager: NetworkServiceProtocol
+    let imageLoader: ImageLoaderProtocol
     
     weak var delegate: FavouritesListViewModelDelegate?
     
-    private var favourites: [Follower] = []
+    var favourites: [FavouriteViewModel] = []
     
-    init(persistenceManager: PersistenceManagerProtocol, networkManager: NetworkServiceProtocol) {
+    init(persistenceManager: PersistenceManagerProtocol, imageLoader: ImageLoaderProtocol) {
         self.persistenceManager = persistenceManager
-        self.networkManager = networkManager
+        self.imageLoader = imageLoader
     }
     
     func getRowCount() -> Int {
@@ -37,43 +37,38 @@ class FavouritesListViewModel: FavouritesListViewModelProtocol {
     }
     
     func getFavourites() {
-//        persistenceManager.retrieveFavourites { [weak self] result in
-//            guard let self = self else {return}
-//            
-//            switch result {
-//            case .success(let favourites):
-//                self.favourites = favourites
-//                delegate?.didUpdateFavourites(self.favourites)
-//        
-//            case .failure(let error):
-//                delegate?.didFailToFavouriteUser(with: error.rawValue)
-//            }
-//        }
+        let result = persistenceManager.retrieveFavourites()
+        switch result {
+        case .success(let favourites):
+            self.favourites = favourites.map{ FavouriteViewModel(imageLoader: self.imageLoader, favourite:$0 )}
+            delegate?.didUpdateFavourites(self.favourites)
+            
+        case .failure(let error):
+            delegate?.didFailToFavouriteUser(with: error.rawValue)
+        }
     }
     
-    func getFavourite(at index: Int) -> Follower {
+    func getFavouriteViewModel(at index: Int) -> FavouriteViewModel {
         self.favourites[index]
     }
     
+    func getFavouriteLogin(at index: Int) -> String {
+        self.favourites[index].favourite.login
+    }
+    
     func removeFavourites(at index: Int) {
-//        let favourite = self.favourites[index]
-//        persistenceManager.updateFavourites(actionType: .remove, favourite: favourite) { [weak self] error in
-//            guard let self = self else {
-//                return
-//            }
-//            guard let error = error else {
-//                self.favourites.remove(at: index)
-//                self.delegate?.didRemoveFavourite(at: index)
-//                return
-//            }
-//            
-//            self.delegate?.didFailToRemoveFavourite(with: error.rawValue)
-//        }
+        let favourite = self.favourites[index].favourite
+        if let error = persistenceManager.updateFavourites(actionType: .remove, favourite: favourite) {
+            self.delegate?.didFailToRemoveFavourite(with: error.rawValue)
+        } else {
+            self.favourites.remove(at: index)
+            self.delegate?.didRemoveFavourite(at: index)
+        }
     }
 }
 
 protocol FavouritesListViewModelDelegate: AnyObject {
-    func didUpdateFavourites(_ favourites: [Follower])
+    func didUpdateFavourites(_ favourites: [FavouriteViewModel])
     func didFailToFavouriteUser(with errorMessage: String)
     
     func didRemoveFavourite(at rowIndex: Int)

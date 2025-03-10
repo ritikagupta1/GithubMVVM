@@ -100,7 +100,8 @@ final class SearchViewController: UIViewController {
         let followerListViewModel = FollowerListViewModel(
             userName: userName,
             networkManager: NetworkManager(),
-            persistenceManager: PersistenceManager())
+            persistenceManager: PersistenceManager(),
+            imageLoader: ImageLoader())
         let followerListVC = FollowersListVC(viewModel: followerListViewModel)
         self.navigationController?.pushViewController(followerListVC, animated: true)
     }

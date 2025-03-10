@@ -32,7 +32,7 @@ final class GFTabBarController: UITabBarController {
     private func createFavouriteVC() -> UINavigationController {
         let favouritesViewModel = FavouritesListViewModel(
             persistenceManager: PersistenceManager(),
-            networkManager: NetworkManager())
+            imageLoader: ImageLoader())
         let favouriteVC = FavouritesListVC(viewModel: favouritesViewModel)
         favouriteVC.tabBarItem  = UITabBarItem(tabBarSystemItem: .favorites, tag: 2)
         favouriteVC.title = Constants.favourites

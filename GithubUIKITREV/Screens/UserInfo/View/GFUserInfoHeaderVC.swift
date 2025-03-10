@@ -7,8 +7,7 @@
 
 import UIKit
 
-class GFUserInfoHeaderVC: UIViewController {
-    
+final class GFUserInfoHeaderVC: UIViewController {
     var viewModel: GFUserInfoHeaderViewModelProtocol
     
     let avatarImageView = GFImageView(frame: .zero)

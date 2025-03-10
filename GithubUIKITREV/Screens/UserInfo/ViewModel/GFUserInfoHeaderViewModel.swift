@@ -15,14 +15,14 @@ protocol GFUserInfoHeaderViewModelProtocol {
     func downloadImage()
 }
 
-class GFUserInfoHeaderViewModel: GFUserInfoHeaderViewModelProtocol {
-    var networkManager: NetworkServiceProtocol
+final class GFUserInfoHeaderViewModel: GFUserInfoHeaderViewModelProtocol {
+    let imageLoader: ImageLoaderProtocol
     private var user: User
     
     weak var delegate: GFUserInfoHeaderViewModelDelegate?
     
-    init(networkManager: NetworkServiceProtocol, user: User) {
-        self.networkManager = networkManager
+    init(imageLoader: ImageLoaderProtocol, user: User) {
+        self.imageLoader = imageLoader
         self.user = user
     }
     
@@ -43,7 +43,7 @@ class GFUserInfoHeaderViewModel: GFUserInfoHeaderViewModelProtocol {
     }
     
     func downloadImage() {
-        networkManager.downloadImage(from: user.avatarUrl) { [weak self] imageData in
+        imageLoader.loadImage(for: user.avatarUrl) { [weak self] imageData in
             guard let self, let imageData else { return }
             self.delegate?.didUpdateImageData(imageData)
         }

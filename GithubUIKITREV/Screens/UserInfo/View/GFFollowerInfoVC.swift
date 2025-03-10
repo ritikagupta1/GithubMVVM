@@ -10,7 +10,7 @@ protocol GFFollowersInfoVCDelegate: AnyObject {
     func didTapGetFollowers(user: User)
 }
 
-class GFFollowersInfoVC: GFItemInfoVC {
+final class GFFollowersInfoVC: GFItemInfoVC {
     weak var delegate: GFFollowersInfoVCDelegate!
     
     init(user: User, delegate: GFFollowersInfoVCDelegate) {

@@ -12,8 +12,7 @@ protocol UserInfoVCDelegate: AnyObject {
     func didTapGetFollowers(username: String)
 }
 
-class GFUserInfoVC: GFDataLoadingVC {
-    
+final class GFUserInfoVC: GFDataLoadingVC {
     let scrollView = UIScrollView()
     let contentView = UIView()
     let headerView = UIView()
@@ -109,26 +108,14 @@ class GFUserInfoVC: GFDataLoadingVC {
     }
     
     func configureUIElements(with user: User) {
-//        self.add(childVC: ViewControllerFactory.makeUserInfoHeaderVC(with: user), to: self.headerView)
+        let viewModel = GFUserInfoHeaderViewModel(imageLoader: ImageLoader(), user: user)
+        self.add(childVC: GFUserInfoHeaderVC(viewModel: viewModel), to: self.headerView)
         self.add(childVC: GFRepoItemVC(user: user, delegate: self), to: self.itemViewOne)
         self.add(childVC: GFFollowersInfoVC(user: user, delegate: self), to: self.itemViewTwo)
-        self.dateLabel.text = "Github since \(user.createdAt.convertToDisplayFormat())"
+        self.dateLabel.text = "\(Constants.githubSince) \(user.createdAt.convertToDisplayFormat())"
     }
     
     private func add(childVC: UIViewController, to containerView: UIView) {
-        // basic code to add a childVC to a VC
-//        self.addChild(childVC)
-//        childVC.didMove(toParent: self)
-//        view.addSubview(childVC.view)
-//
-//        childVC.view.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            childVC.view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-//            childVC.view.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-//            childVC.view.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-//            childVC.view.heightAnchor.constraint(equalToConstant: 200)
-//        ])
-        
         self.addChild(childVC)
         containerView.addSubview(childVC.view)
         childVC.view.frame = containerView.bounds
@@ -141,9 +128,9 @@ extension GFUserInfoVC: GFRepoItemVCDelegate {
     func didTapGithubProfile(user: User) {
         guard let url = URL(string: user.htmlUrl) else {
             self.presentGFAlertViewController(
-                title: "Invalid URL",
-                message: "The url attached to the user is invalid",
-                buttonTitle: "Ok")
+                title: Constants.invalidUrlTitle,
+                message: Constants.invalidUserNameMessage,
+                buttonTitle: Constants.ok)
             return
         }
         
@@ -172,9 +159,9 @@ extension GFUserInfoVC: GFUserInfoViewModelDelegate {
         DispatchQueue.main.async {
             self.dismissLoadingView()
             self.presentGFAlertViewController(
-                title: "Something went wrong",
+                title: Constants.somethingWentWrongTitle,
                 message: errorMessage,
-                buttonTitle: "Ok")
+                buttonTitle: Constants.ok)
         }
     }
 }

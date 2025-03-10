@@ -7,8 +7,18 @@
 
 import UIKit
 
-class FavouritesListVC: GFDataLoadingVC {
-    let tableView = UITableView()
+final class FavouritesListVC: GFDataLoadingVC {
+    lazy var tableView: UITableView = {
+        let tableView = UITableView()
+        self.view.addSubview(tableView)
+        tableView.frame = view.bounds
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.rowHeight = 80.0
+        tableView.register(FavouriteCell.self, forCellReuseIdentifier: FavouriteCell.reuseID)
+        return tableView
+    }()
+    
     var viewModel: FavouritesListViewModelProtocol
     
     init(viewModel: FavouritesListViewModelProtocol) {
@@ -22,11 +32,9 @@ class FavouritesListVC: GFDataLoadingVC {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         configureViewController()
-        configureTableView()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -39,15 +47,6 @@ class FavouritesListVC: GFDataLoadingVC {
         self.title = "Favourites"
         self.navigationController?.navigationBar.prefersLargeTitles = true
     }
-    
-    func configureTableView() {
-        self.view.addSubview(tableView)
-        tableView.frame = view.bounds
-        tableView.dataSource = self
-        tableView.delegate = self
-        tableView.rowHeight = 80.0
-        tableView.register(FavouriteCell.self, forCellReuseIdentifier: FavouriteCell.reuseID)
-    }
 }
 
 extension FavouritesListVC: UITableViewDataSource, UITableViewDelegate {
@@ -59,18 +58,20 @@ extension FavouritesListVC: UITableViewDataSource, UITableViewDelegate {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: FavouriteCell.reuseID, for: indexPath) as? FavouriteCell else {
             return UITableViewCell()
         }
-        let favouriteCellViewModel = FavouriteCellViewModel(
-            networkManager: viewModel.networkManager,
-            favourite: viewModel.getFavourite(at: indexPath.row))
+        let favouriteCellViewModel = self.viewModel.getFavouriteViewModel(at: indexPath.row)
         cell.set(with: favouriteCellViewModel)
         return cell
     }
     
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        let selectedFavourite = self.viewModel.getFavourite(at: indexPath.row)
-//        let destinationVC = ViewControllerFactory.makeFollowersListVC(with: selectedFavourite.login)
-//        navigationController?.pushViewController(destinationVC, animated: true)
+        let selectedFavouriteLogin = self.viewModel.getFavouriteLogin(at: indexPath.row)
+        let vm = FollowerListViewModel(userName: selectedFavouriteLogin,
+                                                  networkManager: NetworkManager(),
+                                                  persistenceManager: PersistenceManager(),
+                                                  imageLoader: ImageLoader())
+        let destVC = FollowersListVC(viewModel: vm)
+        navigationController?.pushViewController(destVC, animated: true)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
@@ -83,7 +84,7 @@ extension FavouritesListVC: UITableViewDataSource, UITableViewDelegate {
 }
 
 extension FavouritesListVC: FavouritesListViewModelDelegate {
-    func didUpdateFavourites(_ favourites: [Follower]) {
+    func didUpdateFavourites(_ favourites: [FavouriteViewModel]) {
         DispatchQueue.main.async {
             self.tableView.reloadData()
             self.view.bringSubviewToFront(self.tableView)
@@ -96,9 +97,9 @@ extension FavouritesListVC: FavouritesListViewModelDelegate {
     func didFailToFavouriteUser(with errorMessage: String) {
         DispatchQueue.main.async {
             self.presentGFAlertViewController(
-                title: "Something went wrong",
+                title: Constants.somethingWentWrongTitle,
                 message: errorMessage,
-                buttonTitle: "Ok")
+                buttonTitle: Constants.ok)
         }
     }
     
@@ -110,7 +111,7 @@ extension FavouritesListVC: FavouritesListViewModelDelegate {
     
     func didFailToRemoveFavourite(with errorMessage: String) {
         DispatchQueue.main.async {
-            self.presentGFAlertViewController(title: "Unable to remove the favourited user", message: errorMessage, buttonTitle: "ok")
+            self.presentGFAlertViewController(title: Constants.unableToRemoveFavouriteUser, message: errorMessage, buttonTitle: Constants.ok)
         }
     }
     

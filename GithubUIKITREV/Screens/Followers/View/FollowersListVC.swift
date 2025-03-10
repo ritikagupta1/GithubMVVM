@@ -11,13 +11,19 @@ enum Section {
     case main
 }
 
-class FollowersListVC: GFDataLoadingVC {
+final class FollowersListVC: GFDataLoadingVC {
     var viewModel: FollowerListViewModelProtocol
     
-    var collectionView: UICollectionView!
+    lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UIHelper.createCollectionViewFlowLayout(in: self.view))
+        collectionView.backgroundColor = .systemBackground
+        view.addSubview(collectionView)
+        collectionView.delegate = self
+        collectionView.register(FollowerCell.self, forCellWithReuseIdentifier: FollowerCell.reuseIdentifier)
+        return collectionView
+    }()
     
-    var dataSource: UICollectionViewDiffableDataSource<Section,Follower>!
-    
+    var dataSource: UICollectionViewDiffableDataSource<Section,FollowerViewModel>?
     
     init(viewModel: FollowerListViewModelProtocol) {
         self.viewModel = viewModel
@@ -35,7 +41,6 @@ class FollowersListVC: GFDataLoadingVC {
         super.viewDidLoad()
         self.configureViewController()
         self.configureSearchController()
-        self.setUpCollectionView()
         self.setUpDataSource()
         self.getFollowers()
     }
@@ -49,17 +54,6 @@ class FollowersListVC: GFDataLoadingVC {
         self.view.backgroundColor = .systemBackground
         self.navigationController?.navigationBar.prefersLargeTitles = true
         self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addFavourites))
-    }
-    
-    private func setUpCollectionView() {
-        collectionView = UICollectionView(frame: view.bounds, collectionViewLayout: UIHelper.createCollectionViewFlowLayout(in: self.view))
-        collectionView.backgroundColor = .systemBackground
-        
-        view.addSubview(collectionView)
-        
-        collectionView.delegate = self
-    
-        collectionView.register(FollowerCell.self, forCellWithReuseIdentifier: FollowerCell.reuseIdentifier)
     }
     
     private func configureSearchController() {
@@ -85,21 +79,18 @@ class FollowersListVC: GFDataLoadingVC {
 // MARK: COLLECTIONVIEW DATASOURCE
 extension FollowersListVC {
     private func setUpDataSource() {
-        dataSource = UICollectionViewDiffableDataSource(collectionView: self.collectionView, cellProvider: { collectionView, indexPath, follower in
+        dataSource = UICollectionViewDiffableDataSource(collectionView: self.collectionView, cellProvider: {collectionView, indexPath, followerViewModel in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: FollowerCell.reuseIdentifier, for: indexPath) as? FollowerCell
-            let viewModel = FollowerCellViewModel(
-                networkManager: self.viewModel.networkManager,
-                follower: follower)
-            cell?.setup(with: viewModel)
+            cell?.setup(with: followerViewModel)
             return cell ?? UICollectionViewCell()
         })
     }
     
-    private func applySnapshot(with followers: [Follower]) {
-        var snapShot = NSDiffableDataSourceSnapshot<Section,Follower>()
+    private func applySnapshot(with followers: [FollowerViewModel]) {
+        var snapShot = NSDiffableDataSourceSnapshot<Section,FollowerViewModel>()
         snapShot.appendSections([Section.main])
         snapShot.appendItems(followers)
-        dataSource.apply(snapShot, animatingDifferences: true)
+        dataSource?.apply(snapShot, animatingDifferences: true)
     }
     
 }
@@ -130,10 +121,11 @@ extension FollowersListVC: UICollectionViewDelegate {
     
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-//        let selectedFollower = self.viewModel.getSelectedFollower(index: indexPath.row)
-//        let userInfoVC = ViewControllerFactory.makeUserInfoVC(userName: selectedFollower.login)
-//        userInfoVC.delegate = self
-//        self.present(UINavigationController(rootViewController: userInfoVC), animated: true)
+        let selectedFollowerLoginID = self.viewModel.getSelectedFollower(index: indexPath.row)
+        let viewModel = GFUserInfoViewModel(userName: selectedFollowerLoginID, networkManager: NetworkManager())
+        let userInfoVC = GFUserInfoVC(viewModel: viewModel)
+        userInfoVC.delegate = self
+        self.present(UINavigationController(rootViewController: userInfoVC), animated: true)
     }
 }
 
@@ -143,19 +135,19 @@ extension FollowersListVC: FollowerListViewModelDelegate {
             switch result {
             case .success:
                 self.presentGFAlertViewController(
-                    title: "Success",
-                    message: "You have successfully favourited this user 🎊",
-                    buttonTitle: "Ok")
+                    title: Constants.successTitle,
+                    message: Constants.favouriteUserSuccessMessage,
+                    buttonTitle: Constants.ok)
             case .failure(let errorMessage):
                 self.presentGFAlertViewController(
-                    title: "Something went wrong",
+                    title: Constants.somethingWentWrongTitle,
                     message: errorMessage,
-                    buttonTitle: "Ok")
+                    buttonTitle: Constants.ok)
             }
         }
     }
     
-    func didUpdateFollowers(_ followers: [Follower], isSearchActive: Bool) {
+    func didUpdateFollowers(_ followers: [FollowerViewModel], isSearchActive: Bool) {
         DispatchQueue.main.async {
             self.dismissLoadingView()
             if !isSearchActive && followers.isEmpty {
@@ -170,9 +162,9 @@ extension FollowersListVC: FollowerListViewModelDelegate {
         DispatchQueue.main.async {
             self.dismissLoadingView()
             self.presentGFAlertViewController(
-                title: "Bad Stuff happened",
+                title: Constants.badStuffHappenedTitle,
                 message: message,
-                buttonTitle: "Ok")
+                buttonTitle: Constants.ok)
         }
     }
 }

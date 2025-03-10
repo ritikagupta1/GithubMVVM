@@ -7,12 +7,16 @@
 
 import UIKit
 
-class FollowerCell: UICollectionViewCell {
-    private var viewModel: FollowerCellViewModelProtocol?
-    
+final class FollowerCell: UICollectionViewCell {
     static let reuseIdentifier = "followerCell"
-    let imageView =  GFImageView(frame: .zero)
-    let titleLabel = GFTitleLabel(fontSize: 16, alignment: .center)
+    
+    lazy var imageView: GFImageView = {
+        GFImageView(frame: .zero)
+    }()
+    
+    lazy var titleLabel: GFTitleLabel = {
+        GFTitleLabel(fontSize: 16, alignment: .center)
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,17 +33,15 @@ class FollowerCell: UICollectionViewCell {
         super.prepareForReuse()
     }
     
-    func setup(with viewModel: FollowerCellViewModelProtocol) {
-        self.viewModel = viewModel
-        self.viewModel?.delegate = self
+    func setup(with viewModel: FollowerViewModelProtocol) {
+        viewModel.delegate = self
         self.titleLabel.text = viewModel.follower.login
-        
+        self.imageView.image = .avatarPlaceholder
         viewModel.downloadImage()
     }
     
     private func configure() {
         self.contentView.addSubViews(imageView, titleLabel)
-        
         let padding: CGFloat = 8
         
         NSLayoutConstraint.activate([
@@ -56,13 +58,14 @@ class FollowerCell: UICollectionViewCell {
             titleLabel.heightAnchor.constraint(equalToConstant: 20)
         ])
     }
-    
 }
 
 extension FollowerCell: FollowerCellViewModelDelegate {
-    func didUpdateImageData(_ imageData: Data) {
+    func didUpdateImageData(_ imageData: Data, for identifier: String) {
         DispatchQueue.main.async {
-            self.imageView.image = UIImage(data: imageData) ?? .avatarPlaceholder
+            if self.titleLabel.text == identifier {
+                self.imageView.image = UIImage(data: imageData) ?? .avatarPlaceholder
+            }
         }
     }
 }

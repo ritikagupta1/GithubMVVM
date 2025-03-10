@@ -6,32 +6,32 @@
 //
 
 import Foundation
-protocol FavouritesCellViewModelProtocol {
+protocol FavouritesCellViewModelProtocol: AnyObject {
     var favourite: Follower { get }
     var delegate: FavouritesCellViewModelDelegate? { get set}
     func downloadImage()
 }
 
-class FavouriteCellViewModel: FavouritesCellViewModelProtocol {
-    let networkManager: NetworkServiceProtocol
+final class FavouriteViewModel: FavouritesCellViewModelProtocol {
+    let imageLoader: ImageLoaderProtocol
     let favourite: Follower
     
     weak var delegate: FavouritesCellViewModelDelegate?
     
     
-    init(networkManager: NetworkServiceProtocol, favourite: Follower) {
+    init(imageLoader: ImageLoaderProtocol, favourite: Follower) {
         self.favourite = favourite
-        self.networkManager = networkManager
+        self.imageLoader = imageLoader
     }
     
     func downloadImage() {
-        networkManager.downloadImage(from: favourite.avatarUrl) { [weak self] imageData in
+        imageLoader.loadImage(for: favourite.avatarUrl) { [weak self] imageData in
             guard let self, let imageData else { return }
-            self.delegate?.didUpdateImageData(imageData)
+            self.delegate?.didUpdateImageData(imageData, for: self.favourite.login)
         }
     }
 }
 
 protocol FavouritesCellViewModelDelegate: AnyObject {
-    func didUpdateImageData(_ imageData: Data)
+    func didUpdateImageData(_ imageData: Data,for identifier: String)
 }

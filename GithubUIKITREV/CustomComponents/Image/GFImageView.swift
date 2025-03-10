@@ -20,16 +20,13 @@ class GFImageView: UIImageView {
     }
     
     private func configure() {
-        layer.cornerRadius = frame.size.width / 2
-        clipsToBounds = true
-        layer.borderColor = UIColor.label.cgColor
-        layer.borderWidth = 1
+        layer.cornerRadius = 8
+        self.clipsToBounds = true
         translatesAutoresizingMaskIntoConstraints = false
         self.image = GFImageView.placeHolderImage
     }
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        layer.cornerRadius = frame.size.width / 2
     }
 }

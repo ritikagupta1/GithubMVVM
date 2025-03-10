@@ -8,6 +8,7 @@
 import Foundation
 protocol GFUserInfoViewModelProtocol {
     var userName: String {get}
+    
     var networkManager: NetworkServiceProtocol { get }
     
     var delegate: GFUserInfoViewModelDelegate? { get set }
@@ -15,7 +16,7 @@ protocol GFUserInfoViewModelProtocol {
     func getUserInfo()
 }
 
-class GFUserInfoViewModel: GFUserInfoViewModelProtocol {
+final class GFUserInfoViewModel: GFUserInfoViewModelProtocol {
     let userName: String
     let networkManager: NetworkServiceProtocol
     

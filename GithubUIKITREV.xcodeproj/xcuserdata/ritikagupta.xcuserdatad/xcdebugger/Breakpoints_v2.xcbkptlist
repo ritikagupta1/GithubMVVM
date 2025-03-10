@@ -8,7 +8,7 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "DA2A57FF-E02A-4BA0-9E07-806F6B5E8D50"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "GithubUIKITREV/NetworkManager/NetworkManager.swift"
@@ -17,6 +17,100 @@
             startingLineNumber = "19"
             endingLineNumber = "19"
             landmarkName = "getData(endPoint:completion:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "3EC316C7-6B39-4710-A14B-6EE3D313DAF3"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GithubUIKITREV/NetworkManager/NetworkManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "24"
+            endingLineNumber = "24"
+            landmarkName = "getData(endPoint:completion:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "3EC316C7-6B39-4710-A14B-6EE3D313DAF3 - a372bb134342e8a8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;Foundation.Data, GithubUIKITREV.NetworkError&gt;) -&gt; () in GithubUIKITREV.NetworkManager.getData&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable, &#x3c4;_0_0: Swift.Encodable&gt;(endPoint: GithubUIKITREV.EndPoint, completion: (Swift.Result&lt;&#x3c4;_0_0, GithubUIKITREV.NetworkError&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "GithubUIKITREV.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ritikagupta/Desktop/iOS/UIKIT-REV/GithubUIKITREV/GithubUIKITREV/NetworkManager/NetworkManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "24"
+                  endingLineNumber = "24">
+               </Location>
+               <Location
+                  uuid = "3EC316C7-6B39-4710-A14B-6EE3D313DAF3 - a372bb134342e8a8"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (Swift.Result&lt;Foundation.Data, GithubUIKITREV.NetworkError&gt;) -&gt; () in GithubUIKITREV.NetworkManager.getData&lt;&#x3c4;_0_0 where &#x3c4;_0_0: Swift.Decodable, &#x3c4;_0_0: Swift.Encodable&gt;(endPoint: GithubUIKITREV.EndPoint, completion: (Swift.Result&lt;&#x3c4;_0_0, GithubUIKITREV.NetworkError&gt;) -&gt; ()) -&gt; ()"
+                  moduleName = "GithubUIKITREV.debug.dylib"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/ritikagupta/Desktop/iOS/UIKIT-REV/GithubUIKITREV/GithubUIKITREV/NetworkManager/NetworkManager.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "24"
+                  endingLineNumber = "24">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "C83FFB87-3770-43F5-AA4D-EE8D41EF60C3"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GithubUIKITREV/Screens/Followers/ViewModel/FollowerListViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "60"
+            endingLineNumber = "60"
+            landmarkName = "getFollowers()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "F73A964C-A4FD-495B-8C7C-A1707D4A5502"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GithubUIKITREV/Screens/Favourites/View/FavouritesCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "64"
+            endingLineNumber = "64"
+            landmarkName = "didUpdateImageData(_:for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "4EDE39C5-89D1-49F0-BFE1-5CE240A82CDF"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "GithubUIKITREV/Screens/Favourites/View/FavouritesCell.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
+            landmarkName = "didUpdateImageData(_:for:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

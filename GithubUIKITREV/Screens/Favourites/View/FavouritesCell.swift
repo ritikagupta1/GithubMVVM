@@ -7,12 +7,16 @@
 
 import UIKit
 
-class FavouriteCell: UITableViewCell {
+final class FavouriteCell: UITableViewCell {
     static let reuseID = "favouriteCell"
-    let avatarImageView = GFImageView(frame: .zero)
-    let titleLabel = GFTitleLabel(fontSize: 26, alignment: .left)
     
-    var viewModel: FavouritesCellViewModelProtocol?
+    lazy var avatarImageView : GFImageView = {
+        GFImageView(frame: .zero)
+    }()
+    
+    lazy var titleLabel: GFTitleLabel = {
+        GFTitleLabel(fontSize: 26, alignment: .left)
+    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -49,18 +53,18 @@ class FavouriteCell: UITableViewCell {
     }
     
     func set(with viewModel: FavouritesCellViewModelProtocol) {
-        self.viewModel = viewModel
         self.titleLabel.text = viewModel.favourite.login
-        
-        self.viewModel?.delegate = self
+        viewModel.delegate = self
         viewModel.downloadImage()
     }
 }
 
 extension FavouriteCell: FavouritesCellViewModelDelegate {
-    func didUpdateImageData(_ imageData: Data) {
+    func didUpdateImageData(_ imageData: Data, for identifier: String) {
         DispatchQueue.main.async {
-            self.avatarImageView.image = UIImage(data: imageData) ?? .avatarPlaceholder
+            if self.titleLabel.text == identifier {
+                self.avatarImageView.image = UIImage(data: imageData) ?? .avatarPlaceholder
+            }
         }
     }
 }
